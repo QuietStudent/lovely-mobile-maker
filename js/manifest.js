@@ -2,6 +2,12 @@ function modifyManifest(xml, newName, newBundle) {
     const root = xml.documentElement;
     let changed = false;
     if (root.tagName !== "manifest") throw new Error("Non-manifest XML document passed");
+    // APK Signature Scheme v2 requires Android 7.0/API 24 or newer.
+    const sdk = root.querySelector("uses-sdk");
+    if (sdk && Number(sdk.getAttribute("android:minSdkVersion")) < 24) {
+	sdk.setAttribute("android:minSdkVersion", "24");
+	changed = true;
+    }
     if (newName) {
 	const app = root.querySelector("application");
 	const old = app.getAttribute("android:label");

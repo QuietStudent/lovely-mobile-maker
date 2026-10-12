@@ -2,6 +2,14 @@
 
 Tool to make an apk with lovely from a love game *cough cough* balatro.
 
+## Android phone updater
+
+This fork adds an Android launcher that can select Lovely **0.9.0** or **0.10.0**, choose Steamodded and Multiplayer versions (including older releases and prereleases), and install additional Lua/Lovely mods. JokerDisplay and Blueprint have shortcuts; other mods can be installed from a GitHub repository or a ZIP on the phone. Managed mods can be disabled, enabled, or restored to their previous version. Installing a mod never updates its dependencies automatically. Additional Android Lovely builds can be downloaded from a maintainer-hosted HTTPS catalog.
+
+The Android base must be rebuilt to include this launcher and the dynamic Lovely bridge. The existing production `base.apk` does not gain these features just from the website changes. The maker detects the base's capability marker and enables the initial Lovely selector only for a compatible base.
+
+See [the Android updater build and phone instructions](android-runtime/README.md). The `Android with phone updates` GitHub Actions workflow produces a base APK, Android Lovely libraries, and a web maker bundle. No Balatro game files are included.
+
 # Development
 Below are the instructions to make a working build.
 

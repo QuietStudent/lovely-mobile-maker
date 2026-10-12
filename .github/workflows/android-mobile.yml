@@ -1,0 +1,85 @@
+name: Android with phone updates
+on:
+  workflow_dispatch:
+    inputs:
+      lovely_download_base:
+        description: 'Optional HTTPS directory for hosting future Lovely libraries'
+        required: false
+        type: string
+  push:
+    paths: ['android-runtime/**', '.github/workflows/android-mobile.yml']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-multilib g++-multilib luajit
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' 'ndk;25.2.9519653'
+          rustup toolchain install stable --profile minimal
+          rustup target add --toolchain stable aarch64-linux-android armv7-linux-androideabi
+      - name: Test updater file operations
+        run: bash android-runtime/test.sh
+      - name: Restore Android Rust build cache
+        id: android-rust-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .build/mobile-0.9.0/target
+            .build/mobile-0.10.0/target
+          key: android-rust-ndk25-${{ runner.os }}-${{ hashFiles('android-runtime/native/mobile_lib.rs') }}
+      - name: Build Android runtime
+        env:
+          LOVELY_DOWNLOAD_BASE: '${{ inputs.lovely_download_base }}'
+        run: bash android-runtime/build.sh
+      - name: Build web maker WASM
+        run: |
+          rustup target add --toolchain stable wasm32-unknown-unknown
+          cargo +stable install wasm-pack --locked
+          cd bindgen
+          RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target web
+      - name: Package web maker
+        run: |
+          mkdir -p dist/web/js/pkg
+          cp index.html faq.html debug-cert.pem dist/web/
+          cp -r css img dist/web/
+          cp js/*.js dist/web/js/
+          cp bindgen/pkg/* dist/web/js/pkg/
+          cp dist/base.apk dist/web/base.apk
+          cp README.md dist/README.md
+          cp android-runtime/README.md dist/ANDROID-UPDATER.md
+          node android-runtime/make-standalone.mjs dist/base.apk
+          cp RUN-ME-FIRST.md dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lovely-mobile-maker-android
+          path: dist/
+          retention-days: 30
+      - name: Save Android Rust build cache
+        if: always() && steps.android-rust-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .build/mobile-0.9.0/target
+            .build/mobile-0.10.0/target
+          key: ${{ steps.android-rust-cache.outputs.cache-primary-key }}

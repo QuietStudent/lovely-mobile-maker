@@ -1,7 +1,8 @@
-import init, { zip_open, zip_read_file, entry_names, axml_to_xml, xml_to_axml, write_file, zip_save_and_sign_v2 } from "./pkg/mbf_bindgen.js";
+import init, { zip_open, zip_read_file, entry_names, axml_to_xml, xml_to_axml, write_file, delete_file, zip_save_and_sign_v2 } from "./pkg/mbf_bindgen.js";
 import { modifyManifest, modifyInfoPlist } from "./manifest.js";
 import { downloadBlob, nameToIdentity, asyncTimeout, getMainDir } from "./util.js";
-import { makeIconList, getImageForIcon, icons, getQualities } from "./icon.js";
+import * as iconTools from "./icon.js";
+const { makeIconList, getImageForIcon, getQualities } = iconTools;
 import { imgToPNGOfSize } from "./img.js";
 import sharedState from "./state.js";
 import * as platformValues from "./platform.js";
@@ -167,6 +168,18 @@ class PlatformStep extends Step {
 	this.select = select;
 	this.select.value = "";
 	select.addEventListener("change", this.updateSelect.bind(this));
+	this.baseFile = e.querySelector("#android-basefile");
+	this.baseFile.addEventListener("change", async () => {
+	    const file = this.baseFile.files[0];
+	    if (!file) return;
+	    try {
+		sharedState.apkData = new Uint8Array(await file.arrayBuffer());
+		this.updateStatus("Android base loaded: " + file.name);
+		if (this.select.value === "android") this.updateSelect();
+	    } catch (error) {
+		this.updateStatus("Could not read the Android base: " + error);
+	    }
+	});
     }
 
     clear() {
@@ -246,6 +259,8 @@ class MetaStep extends Step {
 	this.iconList = document.querySelector(".meta-icon-list");
 	this.iconPicker = document.querySelector(".meta-icon-picker");
 	this.customIcon = document.querySelector(".meta-custom-icon");
+	this.lovelyVersion = document.getElementById("android-lovely-version");
+	this.runtimeStatus = document.getElementById("android-runtime-status");
 	this.submit.addEventListener("click", () => this.doneButton());
 	this.icon.addEventListener("click", () => this.toggleIconPicker());
     }
@@ -271,6 +286,28 @@ class MetaStep extends Step {
 	    this.bundle.value = baseID + (varState.identity ? "." + varState.identity : "");
 	    this.prepared = this.prepareAPK();
 	    await this.prepared;
+	    this.lovelyVersion.disabled = true;
+	    sharedState.mobileRuntime = null;
+	    if (sharedState.platform === "android") {
+		const files = entry_names(sharedState.apk);
+		if (files.includes("assets/lmm/runtime.json")) {
+		    const runtime = JSON.parse(decoder.decode(zip_read_file(sharedState.apk, "assets/lmm/runtime.json")));
+		    if (runtime.mobile_api !== 1 || !Array.isArray(runtime.versions) || !runtime.versions.length)
+			throw new Error("Unsupported Android updater base");
+		    this.lovelyVersion.replaceChildren(...runtime.versions.map(version => {
+			const option = document.createElement("option");
+			option.value = version;
+			option.textContent = version;
+			return option;
+		    }));
+		    this.lovelyVersion.value = runtime.versions.includes("0.9.0") ? "0.9.0" : runtime.versions[0];
+		    this.lovelyVersion.disabled = false;
+		    sharedState.mobileRuntime = runtime;
+		    this.runtimeStatus.textContent = "Phone updater included. You can change Lovely and update mods in the installed app.";
+		} else {
+		    this.runtimeStatus.textContent = "This older base does not include the phone updater. Use the updated Android base to enable Lovely selection and mod updates in the installed app.";
+		}
+	    }
 	    if(game.isBalatro) sharedState.icon = 1;
 	    else sharedState.icon = 0;
 	    this.iconList.innerHTML = "";
@@ -289,7 +326,7 @@ class MetaStep extends Step {
 
     async checkIcon() {
 	sharedState.iconImg = null;
-	const icon = icons[sharedState.icon];
+	const icon = iconTools.icons[sharedState.icon];
 	if (icon.type === "internal") {
 	    return true
 	}
@@ -314,6 +351,7 @@ class MetaStep extends Step {
 	const meta = {};
 	meta.name = this.name.value || null;
 	meta.bundle = this.bundle.value;
+	meta.lovelyVersion = sharedState.mobileRuntime ? this.lovelyVersion.value : null;
 	sharedState.meta = meta;
 	this.done();
     }
@@ -418,6 +456,9 @@ class GenerateStep extends Step {
 	if (sharedState.platform === "ios") {
 	    write_file(sharedState.apk, getMainDir(sharedState.apk, sharedState.platform) + "game.love", game.data);
 	} else {
+	    if (sharedState.meta.lovelyVersion) {
+		write_file(sharedState.apk, "assets/lmm/settings.json", encoder.encode(JSON.stringify({ lovely: sharedState.meta.lovelyVersion })));
+	    }
 	    for (const f of game.files) {
 		if (f.endsWith("/")) continue;
 		this.updateStatus2(f);
@@ -434,6 +475,13 @@ class GenerateStep extends Step {
     async signAndSave(){
 	this.updateStatus("Signing game...");
 	await asyncTimeout();
+	if (sharedState.platform === "android") {
+	    // The maker signs with APK v2. Old JAR signatures no longer describe patched files.
+	    for (const name of entry_names(sharedState.apk)) {
+		if (/^META-INF\/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))$/i.test(name))
+		    delete_file(sharedState.apk, name);
+	    }
+	}
 	const raw = zip_save_and_sign_v2(sharedState.apk, sharedState.cert);
 	this.previous.prepareAPK(); // The APK has been consumed
 

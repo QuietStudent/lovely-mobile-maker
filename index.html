@@ -33,6 +33,10 @@
                 <option value="android">Android</option>
             </select>
             </p>
+            <p><label for="android-basefile">Optional Android base APK:</label>
+                <input type="file" id="android-basefile" accept=".apk" />
+            </p>
+            <p>You can select the <code>base.apk</code> downloaded from the Android build workflow. The standalone HTML requires this file.</p>
         </div>
         <div id="step3" class="step collapsed">
             <h3>Step 3 - Downloading Assets</h3>
@@ -66,6 +70,16 @@
                     <p><p>Name: </p><input id="meta-name" type="text"></input></p>
                     <p><p>Bundle ID: </p><input id="meta-bundle" required="true" pattern="[\w\.]+" type="text"></input></p>
                 </div>
+            </div>
+            <div class="android-only">
+                <p id="android-runtime-status"></p>
+                <p><label for="android-lovely-version">Lovely version for the first launch:</label>
+                    <select id="android-lovely-version" disabled>
+                        <option value="0.9.0">0.9.0 (Multiplayer compatible)</option>
+                        <option value="0.10.0">0.10.0</option>
+                    </select>
+                </p>
+                <p>With the phone updater build, the installed app opens a launcher where you can change Lovely, choose Steamodded and Multiplayer versions, install JokerDisplay, Blueprint, or other mods, and restore previous mod versions.</p>
             </div>
             <p><button id="meta-ready">Ready</button></p>
         </div>

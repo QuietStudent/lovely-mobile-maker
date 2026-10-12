@@ -5,7 +5,21 @@ test.zip
 Balatro.love
 Balatro.exe
 
+# Generated game packages and user-supplied games stay local.
+*.apk
+*.ipa
+*.exe
+*.love
+
 target
 mbf-zip/pkg
 mbf-axml/pkg
 bindgen/pkg
+
+# Local upstream checkouts and portable verification tools
+/android/
+/android-lovely/
+/upstream-multiplayer/
+/upstream-lovely-090/
+/.build/
+/dist/
