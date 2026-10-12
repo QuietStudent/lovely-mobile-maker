@@ -1,5 +1,13 @@
 # Lovely Mobile Maker
 
+## Download the Android maker
+
+**[Download Lovely-Mobile-Maker.html](https://github.com/QuietStudent/lovely-mobile-maker/releases/latest/download/Lovely-Mobile-Maker.html)** · [Release page and instructions](https://github.com/QuietStudent/lovely-mobile-maker/releases/latest)
+
+Open the downloaded HTML in Chrome or Edge, select your own `Balatro.exe` or `Balatro.love`, choose **Android / Lovely 0.9.0**, and create your APK locally. The Android runtime base is included; no Actions download or ZIP extraction is needed. Later supported mod updates and Lovely selection happen in the installed Android launcher.
+
+The release contains the maker and runtime base without Balatro game data. Each person supplies their own game files. The source for this Android release is on the [Android updater contribution branch](https://github.com/QuietStudent/lovely-mobile-maker/tree/codex/android-lovely-version-updater).
+
 Tool to make an apk with lovely from a love game *cough cough* balatro.
 
 # Development
