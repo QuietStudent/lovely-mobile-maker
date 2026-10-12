@@ -7,7 +7,8 @@ This is an extension of Lovely Mobile Maker and its LÖVE Android runtime. It ch
 The app opens a bundled Balatro-themed launcher with exactly three home actions:
 **Launch Game**, **Change Lovely Version**, and **Edit Mods**. Screens, styling,
 fonts, installed version selection, enable/disable, and backups all run locally
-inside the APK. No hosted dashboard, BMM backend, or server is required. Internet
+inside the APK. The launcher opens in landscape to match the game, with three
+side-by-side home buttons. No hosted dashboard, BMM backend, or server is required. Internet
 is needed only to browse GitHub versions or download new mods/builds. ZIP imports
 work with files already downloaded onto the phone.
 

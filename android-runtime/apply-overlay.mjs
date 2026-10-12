@@ -43,6 +43,7 @@ patch('app/src/main/AndroidManifest.xml', source => {
         '      <intent-filter>\n        <action android:name="android.intent.action.MAIN" />\n        <category android:name="android.intent.category.LAUNCHER" />\n        <category android:name="tv.ouya.intent.category.GAME" />\n      </intent-filter>\n', '');
     return replace(source, '    <provider', `    <activity android:name="org.love2d.android.LauncherActivity"
         android:exported="true"
+        android:screenOrientation="landscape"
         android:configChanges="orientation|screenSize|keyboardHidden"
         android:theme="@android:style/Theme.Material.NoActionBar">
       <intent-filter>

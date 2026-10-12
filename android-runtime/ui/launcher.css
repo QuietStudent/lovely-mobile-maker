@@ -55,6 +55,21 @@ html,body{margin:0;background:#a53535;color:#f4eee0;min-height:100%;color-scheme
 .lmm-app .lmm-demo-dialog p{font:13px/1.55 system-ui,sans-serif;margin:10px 0}
 .lmm-app label{display:block;margin:14px 0 8px;font-size:18px}
 .lmm-app input{background:#1f3034;border:2px solid #748a89;color:var(--ink);width:100%;padding:12px;border-radius:6px;min-width:0}
-@media(min-width:600px){.lmm-app{padding:32px 40px}.lmm-app .lmm-home{min-height:590px}}
+@media(min-width:560px){
+ .lmm-app{padding:22px 30px;max-width:960px}
+ .lmm-app .lmm-home{min-height:300px;gap:22px;padding:0}
+ .lmm-app .lmm-brand{display:grid;grid-template-columns:110px 1fr 110px;align-items:center}
+ .lmm-app .lmm-brand h1{grid-column:2;font-size:48px;letter-spacing:-2px}
+ .lmm-app .lmm-eyebrow{grid-column:2;margin-top:8px;font-size:13px}
+ .lmm-app .lmm-ready{grid-column:2;margin-top:10px;font-size:13px}
+ .lmm-app .lmm-cards{grid-column:1;grid-row:1 / 4;height:66px;margin:0}
+ .lmm-app .lmm-playing-card{width:38px;height:54px;font-size:24px;margin-right:-12px}
+ .lmm-app .lmm-home-actions{grid-template-columns:repeat(3,minmax(0,1fr));max-width:850px;gap:14px;margin:0 auto}
+ .lmm-app .lmm-home-actions button{min-height:80px;font-size:21px;padding:16px 10px}
+ .lmm-app .lmm-home-actions .lmm-gold{font-size:20px}
+ .lmm-app .lmm-stack{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .lmm-app .lmm-toolbar{margin-bottom:20px}
+ .lmm-app .lmm-copy{margin-bottom:18px}
+}
 @media(max-width:350px){.lmm-app{padding:20px 16px}.lmm-app .lmm-brand h1{font-size:57px}.lmm-app .lmm-home-actions button{font-size:21px}.lmm-app .lmm-home{gap:26px}.lmm-app h2{font-size:25px}}
 @media(prefers-reduced-motion:reduce){.lmm-app button{transition:none}}
