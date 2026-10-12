@@ -1,14 +1,18 @@
 # Lovely Mobile Maker
 
-## Download the Android maker
-
 **[Download Lovely-Mobile-Maker.html](https://github.com/QuietStudent/lovely-mobile-maker/releases/latest/download/Lovely-Mobile-Maker.html)** · [Release page and instructions](https://github.com/QuietStudent/lovely-mobile-maker/releases/latest)
 
-Open the downloaded HTML in Chrome or Edge, select your own `Balatro.exe` or `Balatro.love`, choose **Android / Lovely 0.9.0**, and create your APK locally. The Android runtime base is included; no Actions download or ZIP extraction is needed. Later supported mod updates and Lovely selection happen in the installed Android launcher.
+1. Open the downloaded file in Chrome or Edge.
+2. Choose your `Balatro.exe` or `Balatro.love` file.
+3. Select **Android** and **Lovely 0.9.0**.
+4. Press **Ready**, then install the APK on your phone.
 
-The release contains the maker and runtime base without Balatro game data. Each person supplies their own game files. The source for this Android release is on the [Android updater contribution branch](https://github.com/QuietStudent/lovely-mobile-maker/tree/codex/android-lovely-version-updater).
+Use **Edit Mods** in the app to add mods or change their versions.
 
-Tool to make an apk with lovely from a love game *cough cough* balatro.
+[Try the menu preview](https://github.com/QuietStudent/lovely-mobile-maker/releases/latest/download/Balatro-Launcher-Preview.html)
+
+<details>
+<summary>Developer information</summary>
 
 # Development
 Below are the instructions to make a working build.
@@ -32,3 +36,5 @@ and the base ipa for iOS devices (base.ipa) is from [lmm-love](https://github.co
 
 If your goal is just to make changes to the website, you can just download the base apps from the production lmm ([base.apk](https://lmm.shorty.systems/base.apk) [base.ipa](https://lmm.shorty.systems/base.ipa)).
 
+
+</details>
