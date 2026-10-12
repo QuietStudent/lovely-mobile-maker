@@ -55,7 +55,7 @@ patch('app/src/main/AndroidManifest.xml', source => {
 });
 patch('love/build.gradle', source => replace(source, "abiFilters += 'x86_64'", "// Mobile runtime bundles target ARM only."));
 patch('app/build.gradle', source => replace(source, 'minSdk 21', 'minSdk 24'));
-patch('gradle.properties', source => replace(source, 'app.version_code=32', 'app.version_code=36'));
+patch('gradle.properties', source => replace(source, 'app.version_code=32', 'app.version_code=37'));
 // Include a capability marker: the web maker must never advertise updating on a legacy base.
 const assets = path.join(root, 'app/src/embed/assets/lmm');
 fs.mkdirSync(assets, { recursive: true });

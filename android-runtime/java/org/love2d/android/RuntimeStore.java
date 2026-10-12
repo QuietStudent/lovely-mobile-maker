@@ -121,6 +121,9 @@ public final class RuntimeStore {
         for (File file : entries) {
             if (file.getName().equals(name) || file.getName().equals("lovely")) continue;
             if (!id.isEmpty() && file.isDirectory()) {
+                JSONObject detected = ModInventory.inspect(file);
+                if (detected != null && id.equals(detected.optString("id")))
+                    throw new IOException("This mod is already installed as " + file.getName() + ". Update that entry instead.");
                 File[] metadata = file.listFiles((dir, filename) -> filename.endsWith(".json"));
                 if (metadata != null) for (File json : metadata) {
                     if (json.length() > 1024 * 1024) continue;
@@ -230,16 +233,17 @@ public final class RuntimeStore {
 
     private String installArchive(File zip, File work, String name, String version, String repo) throws Exception {
         ModFiles.name(name); recoverMods();
-        if (repo.equalsIgnoreCase(repositoryFor("Steamodded")) && !name.equals("Steamodded"))
-            throw new IOException("Install this loader using folder name Steamodded to prevent duplicate loaders");
+        boolean loader = repo.equalsIgnoreCase(repositoryFor("Steamodded"));
+        if (loader && !name.equals("Steamodded") && !isLoader(name))
+            throw new IOException("Use the Steamodded shortcut to install this loader");
         File extracted = new File(work, "extracted"); ArchiveStore.extract(zip, extracted);
         File root;
-        if (name.equals("Steamodded")) {
-            if (!repo.equalsIgnoreCase(repositoryFor(name))) throw new IOException("Use the Steamodded shortcut to replace the loader");
+        if (loader) {
             root = ArchiveStore.modRoot(extracted, "manifest.json");
             if (!new File(root, "lovely").isDirectory() || !new File(root, "src").isDirectory())
                 throw new IOException("This Steamodded archive uses an unsupported loader layout");
         } else {
+            if (name.equals("Steamodded") || isLoader(name)) throw new IOException("Use the Steamodded shortcut to replace the loader");
             root = ModFiles.root(extracted);
             if (new File(root, "lovely/loader.toml").isFile() && new File(root, "src").isDirectory())
                 throw new IOException("Use the Steamodded version picker to install this loader");
@@ -256,8 +260,15 @@ public final class RuntimeStore {
             if (!ArchiveStore.child(root, metadata.getString("main_file")).isFile()) throw new IOException("Mod's main Lua file is missing");
             if (metadata.has("dependencies")) dependencies = "\nDeclared dependencies: " + metadata.get("dependencies").toString();
         }
-        if (name.equals("Multiplayer") && (!id.equals("Multiplayer") || !new File(root, "core.lua").isFile()))
+        if ((name.equals("Multiplayer") || repo.equalsIgnoreCase(repositoryFor("Multiplayer"))) && (!id.equals("Multiplayer") || !new File(root, "core.lua").isFile()))
             throw new IOException("Invalid Multiplayer mod archive");
+        // Reuse the actual on-device folder, including versioned names and disabled installs.
+        String lookupRepo = repo;
+        if (lookupRepo.isEmpty()) try { lookupRepo = repositoryFor(name); } catch (IOException ignored) { }
+        String existing = installedName(name, lookupRepo, lookupRepo.isEmpty() ? "" : id);
+        if (!existing.equals(name) && modLocation(name).exists())
+            throw new IOException("This mod is already installed as " + existing + ". Update that entry instead.");
+        name = existing;
         checkDuplicate(name, id);
         for (String other : managedMods()) {
             if (other.equals(name)) continue;
@@ -284,7 +295,14 @@ public final class RuntimeStore {
         for (File parent : new File[]{mods(), disabled}) {
             File[] children = parent.listFiles();
             if (children == null) throw new IOException("Cannot list installed mods");
-            for (File child : children) if (new File(child, ".lmm-release").isFile()) names.add(child.getName());
+            for (File child : children) {
+                if (!child.isDirectory() || child.getName().startsWith(".") || child.getName().equalsIgnoreCase("lovely")) continue;
+                try {
+                    ArchiveStore.child(parent, child.getName());
+                    ModFiles.name(child.getName());
+                    if (ModInventory.inspect(child) != null) names.add(child.getName());
+                } catch (IOException ignored) { }
+            }
         }
         return new ArrayList<>(names);
     }
@@ -296,15 +314,24 @@ public final class RuntimeStore {
 
     public JSONObject source(String name) throws Exception {
         File file = new File(modLocation(name), ".lmm-source");
-        if (file.isFile()) return new JSONObject(read(file));
-        JSONObject result = new JSONObject();
+        if (file.isFile()) {
+            try {
+                JSONObject saved = new JSONObject(read(file));
+                JSONObject detected = ModInventory.inspect(modLocation(name));
+                if (detected != null && saved.optString("repo", "").isEmpty()) saved.put("repo", detected.optString("repo", ""));
+                return saved;
+            } catch (IOException | JSONException ignored) { }
+        }
+        JSONObject result = ModInventory.inspect(modLocation(name));
+        if (result != null) return result;
+        result = new JSONObject();
         try { result.put("repo", repositoryFor(name)); } catch (IOException ignored) { }
         return result;
     }
 
     public void toggleMod(String name) throws Exception {
         recoverMods();
-        if (name.equals("Steamodded")) throw new IOException("Keep Steamodded enabled; other mods depend on the loader");
+        if (name.equals("Steamodded") || isLoader(name)) throw new IOException("Keep Steamodded enabled; other mods depend on the loader");
         boolean wasEnabled = isEnabled(name);
         File original = modLocation(name);
         File target = wasEnabled ? new File(disabled, name) : new File(mods(), name);
@@ -320,7 +347,37 @@ public final class RuntimeStore {
 
     public String modVersion(String name) {
         try { return read(new File(modLocation(name), ".lmm-release")); }
-        catch (Exception e) { return "not managed by LMM"; }
+        catch (Exception e) {
+            try { JSONObject info = ModInventory.inspect(modLocation(name)); return info == null ? "Version unknown" : info.optString("version", "Version unknown"); }
+            catch (Exception ignored) { return "Version unknown"; }
+        }
+    }
+
+    public JSONObject modInfo(String name) throws Exception {
+        JSONObject info = ModInventory.inspect(modLocation(name));
+        if (info == null) info = new JSONObject();
+        info.put("name", name).put("version", modVersion(name)).put("enabled", isEnabled(name))
+            .put("repo", source(name).optString("repo", ""))
+            .put("hasBackup", new File(backups, name).isDirectory());
+        return info;
+    }
+
+    private boolean isLoader(String name) throws Exception {
+        JSONObject info = ModInventory.inspect(modLocation(name));
+        return info != null && info.optBoolean("loader");
+    }
+
+    public String installedName(String preferred, String repo, String id) throws Exception {
+        String found = null;
+        for (String name : managedMods()) {
+            JSONObject info = source(name);
+            boolean match = name.equals(preferred) || (!id.isEmpty() && id.equalsIgnoreCase(info.optString("id")))
+                || (!repo.isEmpty() && repo.equalsIgnoreCase(info.optString("repo")));
+            if (!match) continue;
+            if (found != null) throw new IOException("Multiple copies of this mod are installed. Remove the extra copy first.");
+            found = name;
+        }
+        return found == null ? preferred : found;
     }
 
     public void rollback(String name) throws Exception {

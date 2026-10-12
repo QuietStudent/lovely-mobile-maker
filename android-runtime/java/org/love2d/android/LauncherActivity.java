@@ -89,6 +89,7 @@ public class LauncherActivity extends Activity {
                             String name = ModFiles.name(value);
                             String repo = store.source(name).optString("repo", "");
                             if (repo.isEmpty()) try { repo = RuntimeStore.repositoryFor(name); } catch (IOException ignored) { }
+                            name = store.installedName(name, repo, "");
                             if (repo.isEmpty()) { status("Imported ZIP: import another ZIP with the same folder name, " + name + "."); break; }
                             browseReleases(name, repo, 1); break;
                         }
@@ -136,9 +137,7 @@ public class LauncherActivity extends Activity {
             JSONObject snapshot = new JSONObject().put("selected", store.selected()).put("ready", true);
             snapshot.put("versions", new JSONArray(store.versions()));
             JSONArray mods = new JSONArray();
-            for (String name : store.managedMods()) mods.put(new JSONObject().put("name", name)
-                .put("version", store.modVersion(name)).put("enabled", store.isEnabled(name))
-                .put("repo", store.source(name).optString("repo", "")));
+            for (String name : store.managedMods()) mods.put(store.modInfo(name));
             snapshot.put("mods", mods);
             script("window.LmmApp.update(" + snapshot.toString() + ")");
         } catch (Exception e) { status(e.getMessage()); }
@@ -214,6 +213,7 @@ public class LauncherActivity extends Activity {
     private void browseReleases(String name, String repo, int page) {
         job(() -> {
             List<JSONObject> releases = store.releases(repo, page);
+            final boolean fool = repo.equalsIgnoreCase(RuntimeStore.repositoryFor("WhatsInMyFool"));
             String[] labels = new String[releases.size()];
             for (int i = 0; i < labels.length; i++) {
                 JSONObject release = releases.get(i);
@@ -224,10 +224,10 @@ public class LauncherActivity extends Activity {
                 if (isFinishing() || isDestroyed()) return;
                 AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle(name + " — releases, page " + page);
                 if (labels.length > 0) dialog.setItems(labels, (d, which) -> chooseAsset(name, repo, releases.get(which)));
-                else dialog.setMessage(name.equals("WhatsInMyFool")
+                else dialog.setMessage(fool
                     ? "No published releases. Install current source to download main at its exact commit. Requires Steamodded."
                     : "No releases on this page. Enter a tag, branch, or commit to install from source.");
-                if (name.equals("WhatsInMyFool") && labels.length == 0 && page == 1)
+                if (fool && labels.length == 0 && page == 1)
                     dialog.setPositiveButton("Current source", (d, w) -> confirmInstall(name, repo, "main", () -> store.installRef(name, repo, "main")));
                 if (labels.length == 30) dialog.setPositiveButton("Older releases", (d, w) -> browseReleases(name, repo, page + 1));
                 dialog.setNeutralButton("Tag / branch / SHA", (d, w) -> customRef(name, repo));
