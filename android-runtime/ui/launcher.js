@@ -7,7 +7,7 @@
     {name:'Steamodded', title:'Steamodded', description:'The loader most Balatro mods need.'},
     {name:'Multiplayer', title:'Balatro Multiplayer', description:'Play with friends. Match their mod version.'},
     {name:'JokerDisplay', title:'Joker Display', description:'See what your Jokers will score.'},
-    {name:'Blueprint', title:'Blueprint', description:'Plan your run with a practice tool.'},
+    {name:'Blueprint', title:'Blueprint', description:'Show which Joker Blueprint is copying.'},
     {name:'WhatsInMyFool', title:"What's In My Fool", description:'See which card The Fool will copy.'}
   ];
   let state = {selected:'0.9.0', versions:[], mods:[], ready:false};
