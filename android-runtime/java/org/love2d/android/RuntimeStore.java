@@ -152,6 +152,7 @@ public final class RuntimeStore {
         if (name.equals("Steamodded")) return "Steamodded/smods";
         if (name.equals("JokerDisplay")) return "nh6574/JokerDisplay";
         if (name.equals("Blueprint")) return "stupxd/Blueprint";
+        if (name.equals("WhatsInMyFool")) return "colonthreeing/WhatsInMyFool";
         throw new IOException("Unknown shortcut");
     }
 

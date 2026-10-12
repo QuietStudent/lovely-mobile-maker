@@ -16,6 +16,7 @@ function replace(source, from, to, count = 1) {
 }
 
 fs.cpSync(path.join(here, 'java'), path.join(root, 'love/src/main/java'), { recursive: true });
+fs.appendFileSync(path.join(root, 'app/proguard-rules.pro'), '\n-keepclassmembers class org.love2d.android.LauncherActivity$LocalBridge { @android.webkit.JavascriptInterface <methods>; }\n');
 const luajit = 'love/src/jni/LuaJIT-2.1/src/';
 fs.copyFileSync(path.join(here, 'native/lovely.h'), path.join(root, luajit, 'lovely.h'));
 fs.copyFileSync(path.join(here, 'native/lovely_bridge.c'), path.join(root, luajit, 'lmm_lovely_bridge.c'));
@@ -53,9 +54,10 @@ patch('app/src/main/AndroidManifest.xml', source => {
 });
 patch('love/build.gradle', source => replace(source, "abiFilters += 'x86_64'", "// Mobile runtime bundles target ARM only."));
 patch('app/build.gradle', source => replace(source, 'minSdk 21', 'minSdk 24'));
-patch('gradle.properties', source => replace(source, 'app.version_code=32', 'app.version_code=34'));
+patch('gradle.properties', source => replace(source, 'app.version_code=32', 'app.version_code=35'));
 // Include a capability marker: the web maker must never advertise updating on a legacy base.
 const assets = path.join(root, 'app/src/embed/assets/lmm');
 fs.mkdirSync(assets, { recursive: true });
-fs.writeFileSync(path.join(assets, 'runtime.json'), JSON.stringify({ mobile_api: 1, mod_manager: 2, versions: ['0.9.0', '0.10.0'] }));
+fs.cpSync(path.join(here, 'ui'), path.join(assets, 'ui'), { recursive: true });
+fs.writeFileSync(path.join(assets, 'runtime.json'), JSON.stringify({ mobile_api: 1, mod_manager: 2, launcher_ui: 2, versions: ['0.9.0', '0.10.0'] }));
 console.log('Applied mobile launcher, versioned Lovely bridge, and runtime capability marker.');

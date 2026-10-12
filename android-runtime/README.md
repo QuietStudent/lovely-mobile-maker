@@ -4,10 +4,17 @@ This is an extension of Lovely Mobile Maker and its LÖVE Android runtime. It ch
 
 ## Phone behavior
 
-The app opens a launcher with:
+The app opens a bundled Balatro-themed launcher with exactly three home actions:
+**Launch Game**, **Change Lovely Version**, and **Edit Mods**. Screens, styling,
+fonts, installed version selection, enable/disable, and backups all run locally
+inside the APK. No hosted dashboard, BMM backend, or server is required. Internet
+is needed only to browse GitHub versions or download new mods/builds. ZIP imports
+work with files already downloaded onto the phone.
+
+The child screens preserve these features:
 
 - A Lovely selector. **0.9.0 is the default**, and **0.10.0** is also bundled. These are Android libraries built from the actual upstream Lovely patch cores, not a change to the displayed version string.
-- Release pickers for **Steamodded**, **Multiplayer**, **JokerDisplay** (`nh6574/JokerDisplay`), and **Blueprint** (`stupxd/Blueprint`). Older releases are paginated, prereleases are labeled, and an exact tag, branch, or commit can be entered. Steamodded is never changed automatically when installing another mod.
+- Release pickers for **Steamodded**, **Multiplayer**, **JokerDisplay** (`nh6574/JokerDisplay`), and **Blueprint** (`stupxd/Blueprint`). **What's In My Fool** (`colonthreeing/WhatsInMyFool`) has a Current source shortcut because it has no published releases: the contents of the repository source folder are installed directly in `Mods/WhatsInMyFool`, with the exact commit recorded. Older releases are paginated, prereleases are labeled, and an exact tag, branch, or commit can be entered. Steamodded is never changed automatically when installing another mod.
 - A GitHub repository installer for other mods, and Android's document picker for importing a downloaded mod ZIP. Release ZIP assets can be chosen explicitly; otherwise the source archive at the selected tag is used. Branch installs resolve to a commit recorded in the installed version label.
 - A managed-mod list with enable/disable and previous-version restore. Disabled folders live outside the game's Mods directory, so Lovely and Steamodded cannot load them. The launcher keeps Steamodded enabled because other mods depend on it.
 - A game launch button. Every game runs in a fresh `:game` process so Lovely and mod patches are initialized again. Exit the game before changing versions or updating mods.

@@ -1,0 +1,60 @@
+/* BMM theme colours and button treatment adapted from skyline69/balatro-mod-manager
+ * commit c06dd673d960e855cdf0c5b2630448b062650627, GPL-3.0. See ATTRIBUTION.md. */
+@font-face{font-family:LmmPixel;src:url('PixelifySans.ttf') format('truetype');font-display:swap}
+html,body{margin:0;background:#a53535;color:#f4eee0;min-height:100%;color-scheme:dark}
+.lmm-app{--felt:#a53535;--ink:#f4eee0;--gold:#fdcf51;--panel:#344b50;--blue:#0088d9;--green:#458769;--shadow:#22383c;font-family:LmmPixel,monospace;color:var(--ink);background:radial-gradient(circle,#d6606038 1px,transparent 1.5px) 0 0/9px 9px,var(--felt);padding:24px 22px 26px;box-sizing:border-box;min-height:100vh;max-width:680px;margin:auto;position:relative;isolation:isolate}
+.lmm-app *{box-sizing:border-box}
+.lmm-app h1,.lmm-app h2{font-family:system-ui,sans-serif}
+.lmm-app h1,.lmm-app h2,.lmm-app p{margin:0}
+.lmm-app button,.lmm-app input{font:inherit;font-size:18px}
+.lmm-app button{color:var(--ink);border:0;min-height:48px;line-height:1.2;padding:14px 16px;border-radius:8px;background:var(--panel);box-shadow:0 5px 0 var(--shadow),inset 0 0 0 2px #ffffff16;transition:transform .12s;overflow-wrap:anywhere}
+.lmm-app button:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 var(--shadow)}
+.lmm-app button:focus-visible,.lmm-app input:focus-visible,.lmm-app summary:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+.lmm-app button:disabled{opacity:.55}
+.lmm-app .lmm-blue{background:var(--blue)}
+.lmm-app .lmm-green{background:var(--green)}
+.lmm-app .lmm-gold{background:var(--gold);color:#342a1f;box-shadow:0 5px 0 #b18031,inset 0 0 0 2px #fff3}
+.lmm-app .lmm-home{min-height:560px;display:flex;flex-direction:column;justify-content:center;gap:32px;padding:8px 0 16px}
+.lmm-app .lmm-brand{text-align:center}
+.lmm-app .lmm-brand h1{font-size:64px;letter-spacing:-3px;text-shadow:3px 4px 0 #682528,-1px -1px 0 #682528;line-height:1}
+.lmm-app .lmm-eyebrow{font-size:16px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-top:12px}
+.lmm-app .lmm-cards{height:82px;display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+.lmm-app .lmm-playing-card{width:54px;height:74px;background:var(--ink);color:#ce4747;border:3px solid #d3cbbc;border-radius:6px;display:grid;place-content:center;font-size:32px;box-shadow:0 5px 0 #762829;transform:rotate(-16deg);margin-right:-15px}
+.lmm-app .lmm-playing-card:nth-child(2){color:#344b50;transform:rotate(0);position:relative;z-index:1}
+.lmm-app .lmm-playing-card:nth-child(3){transform:rotate(16deg);margin-right:0}
+.lmm-app .lmm-ready{text-align:center;font-family:system-ui,sans-serif;font-size:14px;color:#f4eee0;margin-top:20px;line-height:1.5}
+.lmm-app .lmm-home-actions{display:grid;gap:17px;width:100%;max-width:380px;margin:auto}
+.lmm-app .lmm-home-actions button{font-size:24px;min-height:66px;text-shadow:1px 1px #22383c}
+.lmm-app .lmm-home-actions .lmm-gold{text-shadow:none;font-size:22px}
+.lmm-app .lmm-footnote{text-align:center;font-family:system-ui,sans-serif;font-size:12px;line-height:1.6;color:#eed5cb}
+.lmm-app .lmm-toolbar{display:flex;gap:16px;align-items:center;margin-bottom:26px}
+.lmm-app .lmm-back{min-width:70px;padding:12px;background:#802e31;box-shadow:0 4px 0 #652528}
+.lmm-app h2{font-size:29px;font-weight:600;line-height:1.15;color:var(--gold)}
+.lmm-app .lmm-copy{font-family:system-ui,sans-serif;font-size:14px;line-height:1.55;margin-bottom:22px;color:#f0e1d8}
+.lmm-app .lmm-stack{display:grid;gap:14px}
+.lmm-app .lmm-row{width:100%;text-align:left;display:flex;gap:16px;align-items:center;justify-content:space-between;padding:17px 18px}
+.lmm-app .lmm-row strong{display:block;font-size:22px;font-weight:500}
+.lmm-app .lmm-row small{display:block;font-family:system-ui,sans-serif;font-size:12px;line-height:1.5;margin-top:5px;color:#e0e6de;overflow-wrap:anywhere}
+.lmm-app .lmm-row .lmm-chevron{font-size:25px;color:var(--gold);flex-shrink:0}
+.lmm-app .lmm-current{box-shadow:0 5px 0 var(--shadow),inset 0 0 0 2px var(--gold)}
+.lmm-app .lmm-state{font-family:system-ui,sans-serif;font-size:12px;border-radius:5px;padding:5px 7px;background:#18312a;color:#bff4ce;white-space:nowrap}
+.lmm-app .lmm-off{background:#28383c;color:#d1d9dc}
+.lmm-app .lmm-section{font-size:22px;margin:26px 0 12px;color:var(--gold)}
+.lmm-app .lmm-wide{width:100%;margin-top:20px}
+.lmm-app .lmm-detail{padding:20px;border-radius:9px;background:var(--panel);margin-bottom:24px;box-shadow:0 5px 0 var(--shadow)}
+.lmm-app .lmm-detail strong{font-size:26px;display:block;margin-bottom:10px;overflow-wrap:anywhere}
+.lmm-app .lmm-detail p{font:14px/1.6 system-ui,sans-serif;overflow-wrap:anywhere}
+.lmm-app details{margin-top:26px;padding-top:18px;border-top:1px solid #e8bc9d66}
+.lmm-app summary{font-size:18px;min-height:44px;display:flex;align-items:center}
+.lmm-app details p{font:13px/1.6 system-ui,sans-serif;margin:8px 0 16px}
+.lmm-app .lmm-status{font:13px/1.55 system-ui,sans-serif;margin-top:24px;padding:12px 14px;background:#712b30;border-radius:6px;white-space:pre-line;overflow-wrap:anywhere}
+.lmm-app .lmm-status:empty{display:none}
+.lmm-app .lmm-preview-label{font:12px/1.4 system-ui,sans-serif;text-align:center;color:#f8dacb;margin-bottom:16px}
+.lmm-app .lmm-demo-dialog{margin-top:18px;padding:20px;background:#24383d;border-radius:8px;box-shadow:0 6px 0 #17292c}
+.lmm-app .lmm-demo-dialog button{margin:8px 0;width:100%;text-align:left}
+.lmm-app .lmm-demo-dialog p{font:13px/1.55 system-ui,sans-serif;margin:10px 0}
+.lmm-app label{display:block;margin:14px 0 8px;font-size:18px}
+.lmm-app input{background:#1f3034;border:2px solid #748a89;color:var(--ink);width:100%;padding:12px;border-radius:6px;min-width:0}
+@media(min-width:600px){.lmm-app{padding:32px 40px}.lmm-app .lmm-home{min-height:590px}}
+@media(max-width:350px){.lmm-app{padding:20px 16px}.lmm-app .lmm-brand h1{font-size:57px}.lmm-app .lmm-home-actions button{font-size:21px}.lmm-app .lmm-home{gap:26px}.lmm-app h2{font-size:25px}}
+@media(prefers-reduced-motion:reduce){.lmm-app button{transition:none}}
